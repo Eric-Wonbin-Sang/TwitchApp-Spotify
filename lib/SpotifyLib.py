@@ -1,6 +1,6 @@
 import spotipy
 
-from Classes import Song
+from lib import Song
 
 
 def get_spotipy_client(client_id, client_secret, scope, redirect_uri):
@@ -15,5 +15,6 @@ def get_spotipy_client(client_id, client_secret, scope, redirect_uri):
 def get_currently_playing_song(spotipy_client):
     current_song_dict = spotipy_client.currently_playing()
     return Song.Song(
+        spotipy_client=spotipy_client,
         current_song_dict=current_song_dict
     )
