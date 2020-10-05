@@ -1,14 +1,17 @@
-import pprint
+import datetime
 
-from Classes import Artist
+from lib import Artist
 
 from General import Functions
 
 
 class Song:
 
-    def __init__(self, **kwargs):
+    def __init__(self, spotipy_client, **kwargs):
+
+        self.spotipy_client = spotipy_client
         self.current_song_dict = kwargs.get("current_song_dict")
+        self.last_time_updated = datetime.datetime.now()
 
         # pp = pprint.PrettyPrinter(indent=4)
         # pp.pprint(self.current_song_dict["item"])
@@ -20,11 +23,14 @@ class Song:
         #     print(x)
 
         self.name = self.current_song_dict["item"]["name"]
+        self.id = self.current_song_dict["item"]["id"]
         self.artist_list = self.get_artist_list()
         self.image_list = self.get_image_list()
         self.is_playing = self.current_song_dict["is_playing"]
         self.current_placement = self.current_song_dict["progress_ms"]
         self.duration = self.current_song_dict["item"]["duration_ms"]
+
+        self.analysis = self.get_analysis()
 
     def get_artist_list(self):
         artist_list = []
@@ -37,6 +43,19 @@ class Song:
         for x in self.current_song_dict["item"]["album"]["images"]:
             image_list.append(x)
         return image_list
+
+    def get_analysis(self):
+        # data_dict = self.spotipy_client.audio_analysis(self.id)
+        # pp = pprint.PrettyPrinter(indent=4)
+        # print(self.duration)
+        # for key, value in data_dict.items():
+        #     if type(value) == list:
+        #         print(key, len(value))
+        #     else:
+        #         print(key, str(value)[:50])
+        # # pp.pprint(data_dict)
+        # exit()
+        pass
 
     def simple_player_str(self):
         return Functions.str_to_length(
