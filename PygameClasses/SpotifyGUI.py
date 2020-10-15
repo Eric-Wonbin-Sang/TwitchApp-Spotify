@@ -6,7 +6,7 @@ import urllib.request
 from lib import SpotifyLib
 from PygameClasses import EasyRect, EasyText
 
-from General import Constants
+from General import Functions, Constants
 
 
 class SpotifyGUI:
@@ -28,6 +28,8 @@ class SpotifyGUI:
         self.song_name_rect = self.get_song_name_rect()
         self.song_artists_rect = self.get_song_artists_rect()
         self.song_playback_rect = self.get_song_playback_rect()
+
+        self.song_time_text = self.get_song_time_text()
 
     def get_song_image(self):
         image_path = "song_image.jpg"
@@ -79,8 +81,29 @@ class SpotifyGUI:
             draw_center=False
         )
 
+    def get_song_time_text(self):
+        text = "{}/{}".format(Functions.milliseconds_to_minute_format(self.song.current_placement),
+                              Functions.milliseconds_to_minute_format(self.song.duration))
+        return EasyText.EasyText(
+            text=text,
+            x=0,
+            y=self.screen_height * .8,
+            size=self.screen_height / 5,
+            font_file="FontFolder/Product Sans Regular.ttf",
+            color=(255, 255, 255),
+            opacity=140,
+            draw_center=False
+        )
+
+    def draw_song_time_text(self):
+        self.song_time_text.x = self.screen_width - self.song_time_text.rect.width - self.spacer_constant
+        self.song_time_text.draw(self.screen)
+
     def update_song(self):
-        if (datetime.datetime.now() - self.song.last_time_updated).seconds > Constants.song_update_time:
+        if (datetime.datetime.now() - self.song.last_time_updated).microseconds > Constants.song_update_time:
+
+            temp_time = datetime.datetime.now()
+
             new_song = SpotifyLib.get_currently_playing_song(self.song.spotipy_client)
             if new_song.id != self.song.id:
                 self.song = new_song
@@ -88,9 +111,14 @@ class SpotifyGUI:
             else:
                 self.song = new_song
 
-    def update(self):
+            microsec = (datetime.datetime.now() - temp_time).microseconds
+            if microsec > Constants.song_update_time:
+                print("{} - Song refresh time: {} seconds".format(datetime.datetime.now(), microsec / 1000000))
 
-        self.update_song()
+    def update(self, update_song=True):
+
+        if update_song:
+            self.update_song()
 
         self.screen_width = self.screen.get_width()
         self.screen_height = self.screen.get_height()
@@ -101,9 +129,11 @@ class SpotifyGUI:
         self.song_name_rect = self.get_song_name_rect()
         self.song_artists_rect = self.get_song_artists_rect()
         self.song_playback_rect = self.get_song_playback_rect()
+        self.song_time_text = self.get_song_time_text()
 
     def draw(self):
         self.song_playback_rect.draw(self.screen)
         self.screen.blit(self.transformed_song_image, self.song_image_rect)
         self.song_name_rect.draw(self.screen)
         self.song_artists_rect.draw(self.screen)
+        self.draw_song_time_text()
