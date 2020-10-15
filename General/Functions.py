@@ -44,3 +44,10 @@ def alter_window(hwnd, x=None, y=None, x_delta=None, y_delta=None,
         new_height = 10
     
     win32gui.MoveWindow(hwnd, new_x, new_y, new_width, new_height, True)
+
+
+def milliseconds_to_minute_format(milliseconds):
+    raw_seconds = milliseconds / 1000
+    minutes = int(raw_seconds / 60)
+    seconds = int(raw_seconds - minutes * 60)
+    return "{}:{}".format(minutes, str(int(seconds)).rjust(2, "0"))
