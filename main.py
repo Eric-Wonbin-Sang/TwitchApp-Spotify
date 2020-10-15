@@ -1,5 +1,4 @@
 import pygame
-import win32gui
 
 from lib import SpotifyLib
 from PygameClasses import SpotifyGUI
@@ -25,7 +24,8 @@ def main():
     pygame.init()
     display_width, display_height = 800, 120
     clock = pygame.time.Clock()
-    pygame.display.set_caption("TwitchApp-Spotify")
+    pygame.display.set_caption("Twitchy")
+    pygame.display.set_icon(pygame.image.load("Twitchy Logo.png"))
     screen = pygame.display.set_mode([display_width, display_height], pygame.NOFRAME)
     mouse = WindowsMouse.WindowsMouse()
     hwnd = pygame.display.get_wm_info()["window"]
@@ -42,7 +42,6 @@ def main():
     shrink_up = False
 
     while True:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -89,7 +88,7 @@ def main():
             w, h = pygame.display.get_surface().get_size()
             Functions.alter_window(hwnd, x_delta=x_delta, y_delta=y_delta, width=w, height=h)
 
-        spotify_gui.update()
+        spotify_gui.update(update_song=not drag)
         screen.fill((23, 23, 23))
         spotify_gui.draw()
 
