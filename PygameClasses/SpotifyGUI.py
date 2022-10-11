@@ -22,6 +22,7 @@ class SpotifyGUI:
         self.screen_height = self.screen.get_height()
         self.dimension = int(self.screen_height - self.screen_height / self.spacer_constant)
 
+        self.missing_song_path = "missing_song.jpg"
         self.song_image = self.get_song_image()
         self.transformed_song_image = self.get_transformed_song_image()
         self.song_image_rect = self.get_song_image_rect()
@@ -35,8 +36,10 @@ class SpotifyGUI:
         image_path = "song_image.jpg"
         if os.path.exists(image_path):
             os.remove(image_path)
-        urllib.request.urlretrieve(self.song.image_list[1]["url"], image_path)
-        return pygame.image.load(image_path)
+        if self.song.image_url_list:
+            urllib.request.urlretrieve(self.song.image_url_list[1]["url"], image_path)
+            return pygame.image.load(image_path)
+        return pygame.image.load(self.missing_song_path)
 
     def get_transformed_song_image(self):
         return pygame.transform.scale(self.song_image, (self.dimension, self.dimension))
@@ -61,7 +64,7 @@ class SpotifyGUI:
 
     def get_song_artists_rect(self):
         return EasyText.EasyText(
-            text=", ".join([x.name for x in self.song.artist_list]),
+            text=", ".join([x for x in self.song.artist_list]),
             x=self.dimension + self.screen_height / self.spacer_constant,
             y=self.screen_height - (self.screen_height / 2.5),
             size=self.screen_height / 5,
@@ -75,14 +78,14 @@ class SpotifyGUI:
         return EasyRect.EasyRect(
             x=0,
             y=0,
-            width=self.screen_width * self.song.current_placement / self.song.duration,
+            width=self.screen_width * self.song.curr_progress / self.song.duration,
             height=self.screen_height,
             color=(0, 175, 96 - 30),
             draw_center=False
         )
 
     def get_song_time_text(self):
-        text = "{}/{}".format(Functions.milliseconds_to_minute_format(self.song.current_placement),
+        text = "{}/{}".format(Functions.milliseconds_to_minute_format(self.song.curr_progress),
                               Functions.milliseconds_to_minute_format(self.song.duration))
         return EasyText.EasyText(
             text=text,
@@ -115,10 +118,10 @@ class SpotifyGUI:
             if microsec > Constants.song_update_time:
                 print("{} - Song refresh time: {} seconds".format(datetime.datetime.now(), microsec / 1000000))
 
-    def update(self, update_song=True):
+    def update(self, new_song_info=None):
 
-        if update_song:
-            self.update_song()
+        if new_song_info:
+            self.song = new_song_info
 
         self.screen_width = self.screen.get_width()
         self.screen_height = self.screen.get_height()

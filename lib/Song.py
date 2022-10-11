@@ -13,35 +13,28 @@ class Song:
         self.current_song_dict = kwargs.get("current_song_dict")
         self.last_time_updated = datetime.datetime.now()
 
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(self.current_song_dict["item"])
-
-        # for key, item in self.current_song_dict.items():
-        #     print(key, item)
-        # print("\n-----------------------\n")
-        # for x in self.current_song_dict["item"]["album"]["images"]:
-        #     print(x)
-
-        self.name = self.current_song_dict["item"]["name"]
-        self.id = self.current_song_dict["item"]["id"]
+        self.name = self.current_song_dict["item"]["name"] if self.current_song_dict["item"] else "No song playing"
+        self.id = self.current_song_dict["item"]["id"] if self.current_song_dict else None
         self.artist_list = self.get_artist_list()
         self.image_list = self.get_image_list()
-        self.is_playing = self.current_song_dict["is_playing"]
-        self.current_placement = self.current_song_dict["progress_ms"]
-        self.duration = self.current_song_dict["item"]["duration_ms"]
+        self.is_playing = self.current_song_dict["is_playing"] if self.current_song_dict else None
+        self.current_placement = self.current_song_dict["progress_ms"] if self.current_song_dict else 0
+        self.duration = self.current_song_dict["item"]["duration_ms"] if self.current_song_dict else 1
 
         self.analysis = self.get_analysis()
 
     def get_artist_list(self):
         artist_list = []
-        for artist_dict in self.current_song_dict["item"]["album"]["artists"]:
-            artist_list.append(Artist.Artist(**artist_dict))
+        if self.current_song_dict:
+            for artist_dict in self.current_song_dict["item"]["album"]["artists"]:
+                artist_list.append(Artist.Artist(**artist_dict))
         return artist_list
 
     def get_image_list(self):
         image_list = []
-        for x in self.current_song_dict["item"]["album"]["images"]:
-            image_list.append(x)
+        if self.current_song_dict:
+            for x in self.current_song_dict["item"]["album"]["images"]:
+                image_list.append(x)
         return image_list
 
     def get_analysis(self):

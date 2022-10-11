@@ -51,3 +51,12 @@ def milliseconds_to_minute_format(milliseconds):
     minutes = int(raw_seconds / 60)
     seconds = int(raw_seconds - minutes * 60)
     return "{}:{}".format(minutes, str(int(seconds)).rjust(2, "0"))
+
+
+def get_dict_data(data_dict, *keys):
+    curr_result = data_dict
+    for key in keys:
+        if key not in curr_result:
+            return None
+        curr_result = curr_result[key]
+    return curr_result

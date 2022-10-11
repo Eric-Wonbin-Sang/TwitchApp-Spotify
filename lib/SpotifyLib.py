@@ -1,4 +1,5 @@
 import spotipy
+import requests
 
 from lib import Song
 
@@ -13,8 +14,15 @@ def get_spotipy_client(client_id, client_secret, scope, redirect_uri):
 
 
 def get_currently_playing_song(spotipy_client):
-    current_song_dict = spotipy_client.currently_playing()
-    return Song.Song(
-        spotipy_client=spotipy_client,
-        current_song_dict=current_song_dict
-    )
+    try:
+        current_song_dict = spotipy_client.currently_playing()
+        return Song.Song(
+            spotipy_client=spotipy_client,
+            current_song_dict=current_song_dict
+        )
+    except spotipy.exceptions.SpotifyException:
+        pass
+    except requests.exceptions.ReadTimeout:
+        pass
+    except Exception as e:
+        print("Exception occurred: {}".format(e))

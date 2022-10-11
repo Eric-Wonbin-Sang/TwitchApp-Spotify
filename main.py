@@ -2,7 +2,7 @@ import pygame
 
 from lib import SpotifyLib
 from PygameClasses import SpotifyGUI
-from Classes import WindowsMouse
+from classes import WindowsMouse
 
 from General import Functions, Constants
 
@@ -22,7 +22,7 @@ def get_spotipy_client():
 def main():
 
     pygame.init()
-    display_width, display_height = 800, 120
+    display_width, display_height = 700, 120
     clock = pygame.time.Clock()
     pygame.display.set_caption("Twitchy")
     pygame.display.set_icon(pygame.image.load("Twitchy Logo.png"))
@@ -96,4 +96,5 @@ def main():
         clock.tick(60)
 
 
-main()
+if __name__ == '__main__':
+    main()
