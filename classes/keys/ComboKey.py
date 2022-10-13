@@ -18,7 +18,6 @@ class ComboKey(Key):
 
         self.targets = targets
         self.key_list = [Key(target) for target in self.targets]
-        self.is_pressed = False
 
     def update(self, event):
         if not self.can_update(event):

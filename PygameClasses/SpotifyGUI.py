@@ -1,142 +1,89 @@
-import os
 import pygame
-import datetime
-import urllib.request
 
-from lib import SpotifyLib
-from PygameClasses import EasyRect, EasyText
+from classes.keys.Key import Key
+from classes.keys.ComboKey import ComboKey
+from classes.keys.MouseKey import MouseKey
+from classes.spotify.SongElement import SongElement
+from classes.RollingAverageNumber import RollingAverageNumber
 
 from General import Functions, Constants
 
 
 class SpotifyGUI:
 
-    def __init__(self, song, screen):
+    """
+    This is the main logic for the GUI.
 
-        self.song = song
-        self.screen = screen
+    Note:
+        The key_dict is basically code duplication for optimization's sake. Better to
+        Create the dictionary dynamically. TODO
+    """
 
-        self.spacer_constant = 5
+    app_name = "Twitchy2"
+    app_logo_path = "Twitchy Logo.png"
 
-        self.screen_width = self.screen.get_width()
-        self.screen_height = self.screen.get_height()
-        self.dimension = int(self.screen_height - self.screen_height / self.spacer_constant)
+    display_width = 700
+    display_height = 120
 
-        self.missing_song_path = "missing_song.jpg"
-        self.song_image = self.get_song_image()
-        self.transformed_song_image = self.get_transformed_song_image()
-        self.song_image_rect = self.get_song_image_rect()
-        self.song_name_rect = self.get_song_name_rect()
-        self.song_artists_rect = self.get_song_artists_rect()
-        self.song_playback_rect = self.get_song_playback_rect()
+    window_adjust = Constants.window_adjust
+    window_adjust_x_multiplier = Constants.window_adjust_x_multiplier
+    window_adjust_y_multiplier = Constants.window_adjust_y_multiplier
 
-        self.song_time_text = self.get_song_time_text()
+    x_ran = RollingAverageNumber(10)
+    y_ran = RollingAverageNumber(10)
 
-    def get_song_image(self):
-        image_path = "song_image.jpg"
-        if os.path.exists(image_path):
-            os.remove(image_path)
-        if self.song.image_url_list:
-            urllib.request.urlretrieve(self.song.image_url_list[1]["url"], image_path)
-            return pygame.image.load(image_path)
-        return pygame.image.load(self.missing_song_path)
+    key_dict = {
+        "w": Key("w"),
+        "a": Key("a"),
+        "s": Key("s"),
+        "d": Key("d"),
+        "ctrl": ComboKey("ctrl", "left ctrl", "right ctrl"),
+        "q": Key("q"),
+        "mouse": MouseKey("mouse")
+    }
 
-    def get_transformed_song_image(self):
-        return pygame.transform.scale(self.song_image, (self.dimension, self.dimension))
+    def __init__(self):
 
-    def get_song_image_rect(self):
-        curr_image_rect = self.transformed_song_image.get_rect()
-        curr_image_rect.center = (self.dimension / 2 + self.screen_height / (self.spacer_constant * 2),
-                                  self.screen_height / 2)
-        return curr_image_rect
+        pygame.init()
+        pygame.display.set_caption(self.app_name)
+        pygame.display.set_icon(pygame.image.load(self.app_logo_path))
 
-    def get_song_name_rect(self):
-        return EasyText.EasyText(
-            text=self.song.name,
-            x=self.dimension + self.screen_height / self.spacer_constant,
-            y=self.screen.get_height() / 4,
-            size=self.screen.get_height() / 3.75,
-            font_file="FontFolder/Product Sans Bold.ttf",
-            color=(255, 255, 255),
-            opacity=255,
-            draw_center=False
-        )
+        self.screen = pygame.display.set_mode([self.display_width, self.display_height], pygame.NOFRAME)
+        self.hwnd = pygame.display.get_wm_info()["window"]
 
-    def get_song_artists_rect(self):
-        return EasyText.EasyText(
-            text=", ".join([x for x in self.song.artist_list]),
-            x=self.dimension + self.screen_height / self.spacer_constant,
-            y=self.screen_height - (self.screen_height / 2.5),
-            size=self.screen_height / 5,
-            font_file="FontFolder/Product Sans Regular.ttf",
-            color=(255, 255, 255),
-            opacity=140,
-            draw_center=False
-        )
+    def process_keys(self):
+        """ Only triggers when control is held. """
 
-    def get_song_playback_rect(self):
-        return EasyRect.EasyRect(
-            x=0,
-            y=0,
-            width=self.screen_width * self.song.curr_progress / self.song.duration,
-            height=self.screen_height,
-            color=(0, 175, 96 - 30),
-            draw_center=False
-        )
+        self.key_dict["mouse"].update_position()
 
-    def get_song_time_text(self):
-        text = "{}/{}".format(Functions.milliseconds_to_minute_format(self.song.curr_progress),
-                              Functions.milliseconds_to_minute_format(self.song.duration))
-        return EasyText.EasyText(
-            text=text,
-            x=0,
-            y=self.screen_height * .8,
-            size=self.screen_height / 5,
-            font_file="FontFolder/Product Sans Regular.ttf",
-            color=(255, 255, 255),
-            opacity=140,
-            draw_center=False
-        )
+        def change_dimensions(width_delta=0, height_delta=0):
+            """ TODO: Optimize so w and h isn't called a bunch of times. """
+            w, h = pygame.display.get_surface().get_size()
+            if w + width_delta > 10 and h + height_delta > 10:
+                pygame.display.set_mode((w + width_delta, h + height_delta), pygame.NOFRAME)
 
-    def draw_song_time_text(self):
-        self.song_time_text.x = self.screen_width - self.song_time_text.rect.width - self.spacer_constant
-        self.song_time_text.draw(self.screen)
+        if self.key_dict["ctrl"].is_pressed:
+            if self.key_dict["w"].is_pressed:
+                change_dimensions(height_delta=self.y_ran.add(-self.window_adjust * self.window_adjust_y_multiplier).get_value())
+            if self.key_dict["a"].is_pressed:
+                change_dimensions(width_delta=self.x_ran.add(-self.window_adjust * self.window_adjust_x_multiplier).get_value())
+            if self.key_dict["s"].is_pressed:
+                change_dimensions(height_delta=self.y_ran.add(self.window_adjust * self.window_adjust_y_multiplier).get_value())
+            if self.key_dict["d"].is_pressed:
+                change_dimensions(width_delta=self.x_ran.add(self.window_adjust * self.window_adjust_y_multiplier).get_value())
+            if self.key_dict["q"].is_pressed:
+                pygame.quit()
+        else:
+            self.x_ran.add(0)
+            self.y_ran.add(0)
+        if self.key_dict["mouse"].is_pressed:
+            x_delta, y_delta = self.key_dict["mouse"].x - self.key_dict["mouse"].prev_x, \
+                               self.key_dict["mouse"].y - self.key_dict["mouse"].prev_y
+            width, height = pygame.display.get_surface().get_size()
+            Functions.alter_window(self.hwnd, x_delta=x_delta, y_delta=y_delta, width=width, height=height)
 
-    def update_song(self):
-        if (datetime.datetime.now() - self.song.last_time_updated).microseconds > Constants.song_update_time:
+    def update_and_draw(self, song):
+        song_element = SongElement(song, self.screen)
 
-            temp_time = datetime.datetime.now()
-
-            new_song = SpotifyLib.get_currently_playing_song(self.song.spotipy_client)
-            if new_song.id != self.song.id:
-                self.song = new_song
-                self.song_image = self.get_song_image()
-            else:
-                self.song = new_song
-
-            microsec = (datetime.datetime.now() - temp_time).microseconds
-            if microsec > Constants.song_update_time:
-                print("{} - Song refresh time: {} seconds".format(datetime.datetime.now(), microsec / 1000000))
-
-    def update(self, new_song_info=None):
-
-        if new_song_info:
-            self.song = new_song_info
-
-        self.screen_width = self.screen.get_width()
-        self.screen_height = self.screen.get_height()
-        self.dimension = int(self.screen_height - self.screen_height / self.spacer_constant)
-
-        self.transformed_song_image = self.get_transformed_song_image()
-        self.song_image_rect = self.get_song_image_rect()
-        self.song_name_rect = self.get_song_name_rect()
-        self.song_artists_rect = self.get_song_artists_rect()
-        self.song_playback_rect = self.get_song_playback_rect()
-        self.song_time_text = self.get_song_time_text()
-
-    def draw(self):
-        self.song_playback_rect.draw(self.screen)
-        self.screen.blit(self.transformed_song_image, self.song_image_rect)
-        self.song_name_rect.draw(self.screen)
-        self.song_artists_rect.draw(self.screen)
-        self.draw_song_time_text()
+        self.screen.fill((23, 23, 23))
+        song_element.draw_all()

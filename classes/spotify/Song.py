@@ -1,9 +1,17 @@
-import pprint
-
 from General import Functions
 
 
 class Song:
+
+    """
+    A class for representing the current "song state" of Spotify.
+
+    Note:
+        Might be useful in the future to figure out playlist_name and album_name TODO
+
+    """
+
+    image_path = "song_image.jpg"
 
     def __init__(self, data_dict):
 
@@ -15,9 +23,6 @@ class Song:
         self.duration = Functions.get_dict_data(self.data_dict, "item", "duration_ms")
         self.artist_list = self.get_artist_list()
         self.image_url_list = self.get_image_url_list()
-
-        # self.playlist_name
-        # self.album_name
 
     def get_artist_list(self):
         artists_dict_list = Functions.get_dict_data(self.data_dict, "item", "album", "artists") or []
