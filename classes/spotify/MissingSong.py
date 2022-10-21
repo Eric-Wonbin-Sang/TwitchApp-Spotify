@@ -1,11 +1,18 @@
-import pygame
-
 from classes.spotify.Song import Song
 
 
 class MissingSong(Song):
 
-    missing_song_path = "missing_song.jpg"
+    """
+    A class to show no song.
+
+    Note:
+        I wish missing_song_path was here along with a custom get_image method,
+        but it seems like I overestimated what method overriding does. It seems
+        like methods used in the initializer don't override until the object is
+        initialized. Might need to look more into this. TODO
+
+    """
 
     def __init__(self):
 
@@ -16,6 +23,3 @@ class MissingSong(Song):
         self.curr_progress = 0
         self.duration = 100
         self.artist_list = ["No Artist"]
-
-    def get_song_image(self):
-        return pygame.image.load(self.missing_song_path)

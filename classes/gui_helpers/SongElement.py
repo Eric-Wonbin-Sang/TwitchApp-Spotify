@@ -1,7 +1,6 @@
-import os
-import urllib.request
-
+import io
 import pygame
+import requests
 
 from General import Functions
 from PygameClasses.EasyRect import EasyRect
@@ -10,7 +9,7 @@ from PygameClasses.EasyText import EasyText
 
 class SongElement:
 
-    image_path = "song_image.jpg"
+    missing_song_path = "missing_song.jpg"
     spacer_constant = 5
 
     def __init__(self, song, screen):
@@ -20,8 +19,9 @@ class SongElement:
 
         self.screen_width = self.screen.get_width()
         self.screen_height = self.screen.get_height()
-        self.dimension = int(self.screen_height - self.screen_height / self.spacer_constant)
+        self.dimension = self.screen_height - self.screen_height / self.spacer_constant
 
+        # only generate if song changes
         self.image = self.get_image()
         self.transformed_image = self.get_transformed_image()
         self.image_rect = self.get_image_rect()
@@ -31,14 +31,14 @@ class SongElement:
         self.time_text = self.get_time_text()
 
     def get_image(self):
-        if os.path.exists(self.image_path):
-            os.remove(self.image_path)
         if self.song.image_url_list:
-            urllib.request.urlretrieve(self.song.image_url_list[1]["url"], self.image_path)
-            return pygame.image.load(self.image_path)
+            r = requests.get(self.song.image_url_list[1]["url"])
+            img = io.BytesIO(r.content)
+            return pygame.image.load(img)
+        return pygame.image.load(self.missing_song_path)
 
     def get_transformed_image(self):
-        return pygame.transform.scale(self.get_image(), (self.dimension, self.dimension))
+        return pygame.transform.scale(self.image, (self.dimension, self.dimension))
 
     def get_image_rect(self):
         curr_image_rect = self.transformed_image.get_rect()
@@ -93,6 +93,20 @@ class SongElement:
             opacity=140,
             draw_center=False
         )
+
+    def update(self, song, screen):
+        song.update(song)
+        self.screen = screen
+        self.song = song
+        self.screen_width = self.screen.get_width()
+        self.screen_height = self.screen.get_height()
+        self.dimension = int(self.screen_height - self.screen_height / self.spacer_constant)
+        self.transformed_image = self.get_transformed_image()
+        self.image_rect = self.get_image_rect()
+        self.name_rect = self.get_name_rect()
+        self.artists_rect = self.get_artists_rect()
+        self.playback_rect = self.get_playback_rect()
+        self.time_text = self.get_time_text()
 
     def draw_all(self):
         self.playback_rect.draw(self.screen)

@@ -36,6 +36,16 @@ class Song:
         if data_dict := spotipy_client.currently_playing():
             return Song(data_dict)
 
+    def update(self, song):
+        self.is_playing = song.is_playing
+        self.curr_progress = song.curr_progress
+        self.duration = song.duration
+
+    def __eq__(self, other):
+        return self.name == other.name \
+               and self.artist_list == other.artist_list \
+               and self.image_url_list == other.image_url_list
+
     def __str__(self):
         return f"Song(name={self.name}, is_playing={self.is_playing}, curr_progress={self.curr_progress}, " \
                f"duration={self.duration}, artist_list={self.artist_list}, image_url_list={self.image_url_list})"

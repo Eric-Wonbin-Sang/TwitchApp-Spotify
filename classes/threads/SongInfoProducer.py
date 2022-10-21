@@ -1,6 +1,7 @@
 import spotipy
 import requests
-import threading
+
+from threading import Thread, Event
 
 from classes.spotify.Song import Song
 from classes.spotify.MissingSong import MissingSong
@@ -8,17 +9,21 @@ from classes.spotify.MissingSong import MissingSong
 from General import Functions, Constants
 
 
-class SongInfoProducer(threading.Thread):
+class SongInfoProducer(Thread):
 
+    song_save_count = 4
     missing_song = MissingSong()
 
-    def __init__(self, thread_id, name, queue):
+    def __init__(self, thread_id, name, queue, *args, **kwargs):
 
-        threading.Thread.__init__(self)
+        super().__init__(*args, **kwargs)
 
         self.thread_id = thread_id
         self.name = name
         self.queue = queue
+        self.kill_event = Event()
+
+        self.song_list = []
 
         self.spotipy_client = self.get_spotipy_client()
 
@@ -35,6 +40,7 @@ class SongInfoProducer(threading.Thread):
     def get_currently_playing_song(self):
         try:
             if song := Song.get_song(self.spotipy_client):
+                self.song_list.append(song)
                 return song
         except spotipy.exceptions.SpotifyException or requests.exceptions.ReadTimeout:
             return self.missing_song
@@ -43,6 +49,9 @@ class SongInfoProducer(threading.Thread):
         return self.missing_song
 
     def run(self):
-        while True:
+        while not self.kill_event.is_set():
             if song := self.get_currently_playing_song():
                 self.queue.put(song)
+
+    def stop(self):
+        self.join()
