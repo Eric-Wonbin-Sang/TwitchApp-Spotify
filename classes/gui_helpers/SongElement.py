@@ -2,9 +2,10 @@ import io
 import pygame
 import requests
 
-from General import Functions
 from PygameClasses.EasyRect import EasyRect
 from PygameClasses.EasyText import EasyText
+
+from General import Functions, Constants
 
 
 class SongElement:
@@ -52,7 +53,7 @@ class SongElement:
             x=self.dimension + self.screen_height / self.spacer_constant,
             y=self.screen.get_height() / 4,
             size=self.screen.get_height() / 3.75,
-            font_file="FontFolder/Product Sans Bold.ttf",
+            font_file=Constants.bold_font,
             color=(255, 255, 255),
             opacity=255,
             draw_center=False
@@ -64,7 +65,7 @@ class SongElement:
             x=self.dimension + self.screen_height / self.spacer_constant,
             y=self.screen_height - (self.screen_height / 2.5),
             size=self.screen_height / 5,
-            font_file="FontFolder/Product Sans Regular.ttf",
+            font_file=Constants.regular_font,
             color=(255, 255, 255),
             opacity=140,
             draw_center=False
@@ -88,7 +89,7 @@ class SongElement:
             x=0,
             y=self.screen_height * .8,
             size=self.screen_height / 5,
-            font_file="FontFolder/Product Sans Regular.ttf",
+            font_file=Constants.regular_font,
             color=(255, 255, 255),
             opacity=140,
             draw_center=False

@@ -7,3 +7,8 @@ window_adjust_y_delta = 3
 
 rolling_average_number_x_average_count = 30
 rolling_average_number_y_average_count = 30
+
+regular_font = "resources/fonts/Product Sans Regular.ttf"
+bold_font = "resources/fonts/Product Sans Bold.ttf"
+itallic_font = "resources/fonts/Product Sans Italic.ttf"
+bold_itallic_font = "resources/fonts/Product Sans Bold Italic.ttf"

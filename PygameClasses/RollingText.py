@@ -1,4 +1,6 @@
-from PygameClasses import EasyText, EasyRect
+from PygameClasses import EasyText
+
+from General import Constants
 
 
 class RollingText:
@@ -23,14 +25,14 @@ class RollingText:
             x=self.dimension + self.screen_height / self.spacer_constant,
             y=self.screen.get_height() / 4,
             size=self.screen.get_height() / 3.75,
-            font_file="FontFolder/Product Sans Bold.ttf",
+            font_file=Constants.bold_font,
             color=(255, 255, 255),
             opacity=255,
             draw_center=False
         )
 
-    def get_background_surface(self):
-        return None
+    # def get_background_surface(self):
+    #     return None
 
-    def draw(self):
-        self.screen.blit(self.transformed_song_image, self.song_image_rect)
+    # def draw(self):
+    #     self.screen.blit(self.transformed_song_image, self.song_image_rect)
