@@ -9,7 +9,7 @@ from PygameClasses.EasyText import EasyText
 
 class SongElement:
 
-    missing_song_path = "missing_song.jpg"
+    missing_song_path = "resources/missing_song.jpg"
     spacer_constant = 5
 
     def __init__(self, song, screen):
