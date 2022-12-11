@@ -1,1 +1,5 @@
+wheel==0.38.4
+
 -r common.txt
+
+pywin32==305

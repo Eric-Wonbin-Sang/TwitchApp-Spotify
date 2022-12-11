@@ -1,8 +1,6 @@
 import pygame
-import win32gui
 
 from ctypes import windll
-from math import floor
 
 from exceptions.Exceptions import QuitException
 from classes.gui_helpers.RollingAverageNumber import RollingAverageNumber
@@ -19,15 +17,17 @@ class Resizer:
     x_ran = RollingAverageNumber(Constants.rolling_average_number_x_average_count)
     y_ran = RollingAverageNumber(Constants.rolling_average_number_y_average_count)
 
-    def __init__(self, hwnd, key_dict):
+    def __init__(self, hwnd, key_dict, system_type):
 
         self.width, self.height = pygame.display.get_surface().get_size()
         self.hwnd = hwnd
         self.key_dict = key_dict
+        self.system_type = system_type
         self.x, self.y = self.get_x_and_y()
         self.clock = pygame.time.Clock()
 
     def get_x_and_y(self):
+        import win32gui
         bbox = win32gui.GetWindowRect(self.hwnd)
         return bbox[0], bbox[1]
 

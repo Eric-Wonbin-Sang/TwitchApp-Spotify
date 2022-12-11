@@ -9,7 +9,7 @@ from exceptions.Exceptions import QuitException
 
 def main():
 
-    spotify_gui = SpotifyGUI.SpotifyGUI()
+    spotify_gui = SpotifyGUI.SpotifyGUI("windows")
 
     song_info_queue = queue.Queue(1)
 

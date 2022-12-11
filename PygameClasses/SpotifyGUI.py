@@ -30,10 +30,12 @@ class SpotifyGUI:
         "d": Key("d"),
         "ctrl": ComboKey("ctrl", "left ctrl", "right ctrl"),
         "q": Key("q"),
-        "mouse": MouseKey("mouse")
+        "mouse": MouseKey("mouse", "windows")
     }
 
-    def __init__(self):
+    def __init__(self, system_type):
+
+        self.system_type = system_type
 
         pygame.init()
         pygame.display.set_caption(self.app_name)
@@ -42,7 +44,7 @@ class SpotifyGUI:
         self.screen = pygame.display.set_mode([self.display_width, self.display_height], pygame.NOFRAME)
         self.hwnd = pygame.display.get_wm_info()["window"]
 
-        self.resizer = Resizer(self.hwnd, self.key_dict)
+        self.resizer = Resizer(self.hwnd, self.key_dict, self.system_type)
         self.song_element = None
 
     def update_and_draw(self, song):
