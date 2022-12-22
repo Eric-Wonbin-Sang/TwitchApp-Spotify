@@ -33,7 +33,7 @@ class SongInfoProducer(Thread):
         auth_manager = spotipy.SpotifyOAuth(
             client_id=spotify_credentials_dict["client_id"],
             client_secret=spotify_credentials_dict["secret"],
-            scope="user-read-currently-playing",
+            scope="user-read-currently-playing",    # user-read-playback-state
             redirect_uri="http://localhost:44444/callback")
         return spotipy.Spotify(auth_manager=auth_manager)
 

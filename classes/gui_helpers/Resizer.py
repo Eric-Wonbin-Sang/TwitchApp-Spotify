@@ -1,6 +1,8 @@
 import pygame
 
-from ctypes import windll
+from classes.keys.Key import Key
+from classes.keys.ComboKey import ComboKey
+from classes.keys.MouseKey import MouseKey
 
 from exceptions.Exceptions import QuitException
 from classes.gui_helpers.RollingAverageNumber import RollingAverageNumber
@@ -17,19 +19,32 @@ class Resizer:
     x_ran = RollingAverageNumber(Constants.rolling_average_number_x_average_count)
     y_ran = RollingAverageNumber(Constants.rolling_average_number_y_average_count)
 
-    def __init__(self, hwnd, key_dict, system_type):
+    key_dict = {
+        "w": Key("w"),
+        "a": Key("a"),
+        "s": Key("s"),
+        "d": Key("d"),
+        "r": Key("r"),
+        "ctrl": ComboKey("ctrl", "left ctrl", "right ctrl"),
+        "q": Key("q"),
+        "mouse": MouseKey("mouse", Constants.system_type)
+    }
+
+    def __init__(self, hwnd, system_type):
 
         self.width, self.height = pygame.display.get_surface().get_size()
         self.hwnd = hwnd
-        self.key_dict = key_dict
         self.system_type = system_type
         self.x, self.y = self.get_x_and_y()
         self.clock = pygame.time.Clock()
 
     def get_x_and_y(self):
-        import win32gui
-        bbox = win32gui.GetWindowRect(self.hwnd)
-        return bbox[0], bbox[1]
+        if self.system_type == "windows":
+            import win32gui
+            bbox = win32gui.GetWindowRect(self.hwnd)
+            return bbox[0], bbox[1]
+        else:
+            return 0, 0
 
     def process_keys(self):
 
@@ -53,6 +68,10 @@ class Resizer:
                 x_was_updated = True
             if self.key_dict["q"].is_pressed:
                 raise QuitException
+            if self.key_dict["r"].is_pressed:
+                self.alter_window(
+                    x_delta=0, y_delta=0, width_delta=self.widthd, height_delta=self.height
+                )
 
         if not x_was_updated:
             self.x_ran.add(0)
@@ -83,14 +102,21 @@ class Resizer:
 
     def alter_window(self, x_delta=0, y_delta=0, width_delta=0, height_delta=0):
 
-        self.x, self.y = self.x + x_delta, self.y + y_delta
+        if self.system_type == "windows":
 
-        width_delta = self.modify_int(width_delta)
-        height_delta = self.modify_int(height_delta)
+            from ctypes import windll
 
-        time_adjust = self.clock.tick(90)
-        self.width = new_width if (new_width := self.width + width_delta) * time_adjust >= 10 else 10
-        self.height = new_height if (new_height := self.height + height_delta) * time_adjust >= 10 else 10
+            self.x, self.y = self.x + x_delta, self.y + y_delta
 
-        pygame.display.set_mode((int(self.width), int(self.height)), pygame.NOFRAME)
-        windll.user32.MoveWindow(self.hwnd, self.x, self.y, int(self.width), int(self.height), False)
+            width_delta = self.modify_int(width_delta)
+            height_delta = self.modify_int(height_delta)
+
+            time_adjust = self.clock.tick(90)
+            self.width = new_width if (new_width := self.width + width_delta) * time_adjust >= 10 else 10
+            self.height = new_height if (new_height := self.height + height_delta) * time_adjust >= 10 else 10
+
+            pygame.display.set_mode((int(self.width), int(self.height)), pygame.NOFRAME)
+            windll.user32.MoveWindow(self.hwnd, self.x, self.y, int(self.width), int(self.height), False)
+
+        else:
+            pass
