@@ -70,7 +70,7 @@ class Resizer:
                 raise QuitException
             if self.key_dict["r"].is_pressed:
                 self.alter_window(
-                    x_delta=0, y_delta=0, width_delta=self.widthd, height_delta=self.height
+                    x_delta=0, y_delta=0, width_delta=self.width, height_delta=self.height
                 )
 
         if not x_was_updated:
