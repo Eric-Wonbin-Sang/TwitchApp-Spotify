@@ -3,7 +3,7 @@ system_type = "windows"
 # system_type = "linux"
 
 if system_type == "windows":
-    spotify_credentials_file_path = "Z:/0 - Secrets/TwitchHelper/spotify_credentials.json"
+    spotify_credentials_file_path = "C:\\LocalCodingProjects\\0 - Secrets\\spotify_credentials.json"
 else:
     spotify_credentials_file_path = "/stash/CodingProjects/0 - Secrets/TwitchHelper/spotify_credentials.json"
 
@@ -21,3 +21,7 @@ bold_font = "resources/fonts/Product Sans Bold.ttf"
 itallic_font = "resources/fonts/Product Sans Italic.ttf"
 bold_itallic_font = "resources/fonts/Product Sans Bold Italic.ttf"
 
+app_name = "Twitchy - Spotify"
+
+display_width = 700
+display_height = 120

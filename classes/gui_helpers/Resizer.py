@@ -1,4 +1,5 @@
 import pygame
+import pygetwindow
 
 from classes.keys.Key import Key
 from classes.keys.ComboKey import ComboKey
@@ -11,6 +12,9 @@ from General import Constants
 
 
 class Resizer:
+
+    height_minimum = 10
+    width_minimum = 10
 
     window_adjust_multiplier = Constants.window_adjust_multiplier
     window_adjust_x_delta = Constants.window_adjust_x_delta
@@ -37,6 +41,8 @@ class Resizer:
         self.system_type = system_type
         self.x, self.y = self.get_x_and_y()
         self.clock = pygame.time.Clock()
+
+        self.window = pygetwindow.getWindowsWithTitle(Constants.app_name)[0]
 
     def get_x_and_y(self):
         if self.system_type == "windows":
@@ -70,7 +76,9 @@ class Resizer:
                 raise QuitException
             if self.key_dict["r"].is_pressed:
                 self.alter_window(
-                    x_delta=0, y_delta=0, width_delta=self.width, height_delta=self.height
+                    x_delta=0, y_delta=0,
+                    width_delta=Constants.display_width - self.width,
+                    height_delta=Constants.display_height - self.height
                 )
 
         if not x_was_updated:
@@ -101,22 +109,24 @@ class Resizer:
         print(f"Could not catch resizer integer: {some_int}")
 
     def alter_window(self, x_delta=0, y_delta=0, width_delta=0, height_delta=0):
-
         if self.system_type == "windows":
-
-            from ctypes import windll
 
             self.x, self.y = self.x + x_delta, self.y + y_delta
 
             width_delta = self.modify_int(width_delta)
             height_delta = self.modify_int(height_delta)
 
-            time_adjust = self.clock.tick(90)
-            self.width = new_width if (new_width := self.width + width_delta) * time_adjust >= 10 else 10
-            self.height = new_height if (new_height := self.height + height_delta) * time_adjust >= 10 else 10
+            if width_delta or height_delta:
 
-            pygame.display.set_mode((int(self.width), int(self.height)), pygame.NOFRAME)
-            windll.user32.MoveWindow(self.hwnd, self.x, self.y, int(self.width), int(self.height), False)
+                self.width = new_width if (new_width := self.width + width_delta) >= self.width_minimum else self.width_minimum
+                self.height = new_height if (new_height := self.height + height_delta) >= self.height_minimum else self.height_minimum
+
+                if not (self.width == self.width_minimum and width_delta) and not (self.height == self.height_minimum and height_delta):
+                    pygame.display.set_mode((int(self.width), int(self.height)), pygame.NOFRAME)
+                    self.window.resizeTo(int(self.width), int(self.height))
+
+            if x_delta or y_delta:
+                self.window.moveRel(x_delta, y_delta)
 
         else:
             pass

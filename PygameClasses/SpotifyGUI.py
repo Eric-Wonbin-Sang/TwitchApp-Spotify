@@ -3,6 +3,8 @@ import pygame
 from classes.gui_helpers.Resizer import Resizer
 from classes.gui_helpers.SongElement import SongElement
 
+from General import Constants
+
 
 class SpotifyGUI:
 
@@ -14,11 +16,11 @@ class SpotifyGUI:
         Create the dictionary dynamically. TODO
     """
 
-    app_name = "Twitchy2"
+    app_name = Constants.app_name
     app_logo_path = "Twitchy Logo.png"
 
-    display_width = 700
-    display_height = 120
+    display_width = Constants.display_width
+    display_height = Constants.display_height
 
     def __init__(self, system_type):
 
